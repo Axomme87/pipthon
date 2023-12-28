@@ -1,0 +1,14 @@
+version: '3.7'
+
+services:
+  pipthon:
+    image: $IMG-image
+    container_name: $IMG-container
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - UBUNTU_GROUP=$GRP
+        - UBUNTU_USR=$USR
+        - UBUNTU_USR_PASS=$PASS
+    command: tail -F anything
