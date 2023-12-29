@@ -16,5 +16,5 @@ from the get-go. This process makes it easier to install all the different versi
 
 + Add more installable tools such as Terraform, nvm, npm, node, awscli, azcli, sls, make, kubectl, git, etc
 + combine these installations with visual .dotfiles for installing and configuring oh-my-zsh with powerlevel11k
-+ add git and other shortcuts for and differentiate them from being native or WSL
++ add git and other shortcuts for easier access and differentiate them from being native or WSL
 + TBD
