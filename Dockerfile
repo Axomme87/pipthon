@@ -4,31 +4,26 @@ ARG UBUNTU_GROUP
 ARG UBUNTU_USR
 ARG UBUNTU_USR_PASS
 
-RUN apt-get update &&  \
-    apt-get -y install sudo &&  \
-    apt-get -y install nano &&  \
-    apt-get clean
+# Install essential packages and add a user
+RUN apt-get update && \
+    apt-get install -y sudo nano tzdata && \
+    apt-get clean && \
+    groupadd "${UBUNTU_GROUP}" && \
+    useradd -m -g "${UBUNTU_GROUP}" "${UBUNTU_USR}" && \
+    echo "${UBUNTU_USR}:${UBUNTU_USR_PASS}" | chpasswd && \
+    echo "${UBUNTU_USR} ALL=(ALL:ALL) NOPASSWD:ALL" >> /etc/sudoers
 
-RUN groupadd "$UBUNTU_GROUP"
-RUN useradd -m -g "$UBUNTU_GROUP" "$UBUNTU_USR"
+USER ${UBUNTU_USR}
+ENV HOME=/home/${UBUNTU_USR}
 
-RUN echo "$UBUNTU_USR:$UBUNTU_USR_PASS" | chpasswd
-RUN echo "$UBUNTU_USR  ALL=(ALL:ALL) ALL" >> /etc/sudoers
+WORKDIR ${HOME}
 
-USER $UBUNTU_USR
-ENV HOME=/home/$UBUNTU_USR
-RUN chown "$UBUNTU_USR":"$UBUNTU_GROUP" -R "$HOME"
+# Copy the shell script to the container
+COPY --chown="$UBUNTU_USR":"$UBUNTU_GROUP" pipthon_tools.sh .
 
-WORKDIR $HOME
+# Make the script executable and run it
+RUN chmod u+x ./pipthon_tools.sh
+RUN ./pipthon_tools.sh
 
-COPY pipthon_tools.sh .
-# COPY pyproject.toml .
-# COPY README.md .
-
-# ENV PATH="$HOME/.local/bin:$PATH"
-# RUN pip install --upgrade pip setuptools wheel poetry
-# RUN poetry config virtualenvs.in-project true --local
-# RUN poetry install --without dev
-# ENV PATH="$HOME/app/.venv/bin:$PATH"
-
-# CMD ["python", "-m", "src.main"]
+# Set PATH
+ENV PATH="${HOME}/.local/bin:${PATH}"
